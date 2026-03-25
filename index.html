@@ -84,11 +84,30 @@
         .header-section { background: white; padding: 10px 0 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; width: 100%; }
         .search-container { width: 90%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
         
-        /* QR Code Scanner CSS Added */
-        .search-bar-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        /* --- SMART BOTTOM SHEET DRAWER CSS --- */
+        .nav-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999998; opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(3px); }
+        .nav-overlay.active { opacity: 1; visibility: visible; }
+        .nav-drawer { position: fixed; bottom: -100%; left: 0; width: 100%; background: #fff; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); z-index: 999999; transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15); border-radius: 35px 35px 0 0; display: flex; flex-direction: column; padding-bottom: 20px; }
+        .nav-drawer.open { bottom: 0; }
+        .drawer-pull-line { width: 40px; height: 5px; background: #ddd; border-radius: 10px; margin: 15px auto 5px auto; }
+        .drawer-header { display: flex; justify-content: center; align-items: center; position: relative; padding: 10px 25px 20px; }
+        .drawer-header h2 { margin: 0; font-size: 24px; font-family: 'Playfair Display', serif; color: #d4af37; }
+        .close-nav-btn { position: absolute; right: 20px; top: 10px; font-size: 20px; background: #f4f4f4; border: none; cursor: pointer; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #555; transition: 0.2s; }
+        .close-nav-btn:active { transform: scale(0.9); }
+        .drawer-links { list-style: none; padding: 10px 20px; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .drawer-links li a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 15px 10px; background: #fdfaf0; color: #444; text-decoration: none; border-radius: 20px; border: 1px solid #f2e6c7; font-size: 12px; font-weight: 600; text-align: center; transition: 0.3s;}
+        .drawer-links li a i { color: #d4af37; font-size: 26px; }
+        .drawer-links li a:active { background: #d4af37; color: white; }
+        .drawer-links li a:active i { color: white; }
+
+        /* SEARCH BAR WITH MENU BUTTON AND QR */
+        .search-bar-wrapper { display: flex; align-items: center; gap: 8px; width: 100%; }
+        .search-menu-btn { background: #d4af37; color: white; border: none; width: 40px; height: 40px; min-width: 40px; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 3px 8px rgba(212,175,55,0.3);}
+        .search-menu-btn:active { transform: scale(0.9); }
+        .input-qr-box { position: relative; flex: 1; display: flex; align-items: center; }
         #mainSearch { width: 100%; padding: 10px 45px 10px 15px; border-radius: 30px; border: 1.5px solid #d4af37; outline: none; font-size: 13px; background: #fffaf0; }
-        .qr-scan-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
-        .qr-scan-btn:active { transform: scale(0.9); color: #673ab7; }
+        .inner-qr-btn { position: absolute; right: 12px; color: #d4af37; font-size: 18px; background: none; border: none; outline: none; cursor: pointer; transition: 0.2s; }
+        .inner-qr-btn:active { transform: scale(0.9); color: #673ab7; }
         
         .category-scroll-wrapper { width: 100%; overflow-x: auto; white-space: nowrap; padding: 5px 0; display: flex; gap: 2px; scrollbar-width: none; -ms-overflow-style: none; }
         .category-scroll-wrapper::-webkit-scrollbar { display: none; }
@@ -102,7 +121,7 @@
         
         .gift-item { position: relative; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); text-align: center; overflow: hidden; border: 1px solid #f0f0f0; cursor: pointer; display: flex; flex-direction: column; height: 100%; }
         
-        /* IMAGE FADE-IN CSS ADD KIYA GAYA HAI */
+        /* IMAGE FADE-IN CSS */
         .gift-item img { 
             width: 100%; 
             height: 140px; 
@@ -167,6 +186,20 @@
         </svg>
     </div>
 
+    <div id="navOverlay" class="nav-overlay"></div>
+    <div id="navDrawer" class="nav-drawer">
+        <div class="drawer-pull-line"></div>
+        <div class="drawer-header">
+            <h2>Menu</h2>
+            <button id="closeNavDrawerBtn" class="close-nav-btn">×</button>
+        </div>
+        <ul class="drawer-links">
+            <li><a href="#"><i class="fa-solid fa-house"></i> Home</a></li>
+            <li><a href="#"><i class="fa-solid fa-ring"></i> Collections</a></li>
+            <li><a href="https://wa.me/919977441399" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li>
+        </ul>
+    </div>
+
     <div class="header-section">
         <div class="search-container">
             <div class="category-scroll-wrapper" id="chipContainer">
@@ -177,10 +210,11 @@
             </div>
             
             <div class="search-bar-wrapper">
-                <input type="text" id="mainSearch" onkeypress="handleSearch(event)" placeholder="Search jewelry...">
-                <button class="qr-scan-btn" onclick="openQrScanner()">
-                    <i class="fa-solid fa-qrcode"></i>
-                </button>
+                <button id="openNavDrawerBtn" class="search-menu-btn"><i class="fa-solid fa-bars-staggered"></i></button>
+                <div class="input-qr-box">
+                    <input type="text" id="mainSearch" onkeypress="handleSearch(event)" placeholder="Search jewelry...">
+                    <button class="inner-qr-btn" onclick="openQrScanner()"><i class="fa-solid fa-qrcode"></i></button>
+                </div>
             </div>
         </div>
     </div>
@@ -201,12 +235,12 @@
                 <div class="img-zoom-wrapper">
                     <img id="modalImg" src="" class="modal-img">
                 </div>
-                
                 <div style="text-align: right; margin-top: 10px;">
                     <a id="modalForwardBtn" target="_blank" style="text-decoration: none; display: inline-flex; align-items: center; gap: 5px; background: #fdfaf0; border: 1px solid #d4af37; padding: 6px 12px; border-radius: 20px; color: #333; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                         <i class="fa-brands fa-whatsapp" style="color: #25d366; font-size: 16px;"></i> <span style="font-size: 11px; font-weight: bold;">Forward</span>
                     </a>
                 </div>
+                
                 <h1 id="modalTitle" class="modal-title"></h1>
                 <strong style="color: #511377; font-size:12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); font-family: 'Playfair Display'"> By ANAMIKA JWELLER'S</strong>
                 <table class="spec-table">
@@ -319,7 +353,64 @@
     </footer>
 
     <script>
-        // --- QR SCANNER DIRECT CAMERA LOGIC ADDED ---
+        // --- SMART DRAWER LOGIC ADDED ---
+        const navOverlay = document.getElementById('navOverlay');
+        const navDrawer = document.getElementById('navDrawer');
+        
+        document.getElementById('openNavDrawerBtn').addEventListener('click', () => {
+            navDrawer.style.transition = 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), transform 0.3s ease';
+            navDrawer.classList.add('open');
+            navOverlay.classList.add('active');
+            document.body.style.overflow = "hidden";
+        });
+        
+        const closeNavMenu = () => {
+            navDrawer.classList.remove('open');
+            navOverlay.classList.remove('active');
+            document.body.style.overflow = "auto";
+            setTimeout(() => { navDrawer.style.transform = 'translateY(0)'; }, 400); // Reset transform after animation
+        };
+        
+        document.getElementById('closeNavDrawerBtn').addEventListener('click', closeNavMenu);
+        navOverlay.addEventListener('click', closeNavMenu);
+
+        // --- SWIPE DOWN TO CLOSE LOGIC ---
+        let drawerStartY = 0;
+        let drawerCurrentY = 0;
+        let isDrawerDragging = false;
+
+        navDrawer.addEventListener('touchstart', (e) => {
+            drawerStartY = e.touches[0].clientY;
+            isDrawerDragging = true;
+            navDrawer.style.transition = 'none'; // Taki finger ke sath smooth chale
+        }, { passive: true });
+
+        navDrawer.addEventListener('touchmove', (e) => {
+            if (!isDrawerDragging) return;
+            drawerCurrentY = e.touches[0].clientY;
+            let deltaY = drawerCurrentY - drawerStartY;
+            
+            if (deltaY > 0) { // Sirf niche ki taraf drag karne par
+                navDrawer.style.transform = `translateY(${deltaY}px)`;
+            }
+        }, { passive: true });
+
+        navDrawer.addEventListener('touchend', () => {
+            if (!isDrawerDragging) return;
+            isDrawerDragging = false;
+            navDrawer.style.transition = 'bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), transform 0.3s ease'; // Wapas animation on
+            
+            let deltaY = drawerCurrentY - drawerStartY;
+            if (deltaY > 80) { // Agar 80px se zyada niche khincha toh band kar do
+                closeNavMenu();
+            } else { // Warna wapas upar snap kar do
+                navDrawer.style.transform = 'translateY(0)';
+            }
+            drawerCurrentY = 0;
+        });
+        // --------------------------------
+
+        // --- QR SCANNER DIRECT CAMERA LOGIC ---
         let html5QrCode = null;
 
         function openQrScanner() {
@@ -439,7 +530,7 @@
             document.getElementById('modalDescBox').style.display = desc.trim() !== "" ? "block" : "none";
             document.getElementById('modalDesc').innerText = desc;
             
-            const productLink = `https://anamikajwellers.netlify.app/product-detail.html?id=${id}`;
+            const productLink = `https://anamikajwellers.mobie.in/product-detail.html?id=${id}`;
             const waMsg = `Hi Anamika Jewellers, mujhe is item ki enquiry karni hai:\n\n*Item:* ${item.title || id.toUpperCase()}\n*Code:* ${id.toUpperCase()}\n*Weight:* ${item.weight || 'N/A'}\n*Link:* ${productLink}`;
             document.getElementById('modalWaBtn').href = `https://wa.me/919977441399?text=${encodeURIComponent(waMsg)}`;
             
